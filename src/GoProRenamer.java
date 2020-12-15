@@ -7,12 +7,12 @@ import java.util.*;
  * GH010151.MP4
  * GH,GX 01(正常的) 02(要修改) 03(要修改) 11(要修改)
  */
-public class GoProNamer {
+public class GoProRenamer {
     private final String path;
     private final List<String> files = new ArrayList<>();
     private final Map<String, String> pairs = new HashMap<>();
 
-    public GoProNamer(String path) {
+    public GoProRenamer(String path) {
         this.path = path;
         LogUtil.log("任务开始!");
         try {
