@@ -1,3 +1,7 @@
+package presenter;
+
+import utils.TextUtil;
+
 import java.io.File;
 import java.util.*;
 
@@ -11,18 +15,20 @@ public class GoProRenamer {
     private final String path;
     private final List<String> files = new ArrayList<>();
     private final Map<String, String> pairs = new HashMap<>();
+    private final OnLogListener logger;
 
-    public GoProRenamer(String path) {
+    public GoProRenamer(String path, OnLogListener logger) {
         this.path = path;
-        LogUtil.log("任务开始!");
+        this.logger = logger;
+        log("任务开始!");
         try {
             collect();
             check();
             rename();
         } catch (Exception ex) {
-            LogUtil.log("异常:" + ex.getMessage());
+            log("异常:" + ex.getMessage());
         } finally {
-            LogUtil.log("任务结束!");
+            log("任务结束!");
         }
     }
 
@@ -31,7 +37,7 @@ public class GoProRenamer {
         if (dir.isDirectory()) {
             String[] fileNames = dir.list();
             if (fileNames == null || fileNames.length == 0) {
-                LogUtil.log("文件夹为空!");
+                log("文件夹为空!");
             } else {
                 files.addAll(Arrays.asList(fileNames));
             }
@@ -48,7 +54,7 @@ public class GoProRenamer {
                 pairs.put(item, toName);
                 pairs.put(sourceName, insertedName(sourceName, "01"));
             } else {
-                LogUtil.log(item + "  不需要重命名.");
+                log(item + "  不需要重命名.");
             }
         }
     }
@@ -61,7 +67,7 @@ public class GoProRenamer {
             if (!TextUtil.isEmpty(from) && !TextUtil.isEmpty(to)) {
                 rename(from, to);
             } else {
-                LogUtil.log("出现空的情况:" + from + "|" + to);
+                log("出现空的情况:" + from + "|" + to);
             }
         }
     }
@@ -70,9 +76,9 @@ public class GoProRenamer {
         File file = new File(path, from);
         if (file.exists()) {
             boolean success = file.renameTo(new File(path, to));
-            LogUtil.log(String.format("%s 重命名为 %s 结果: %s", from, to, success ? "成功!" : "失败!"));
+            log(String.format("%s 重命名为 %s 结果: %s", from, to, success ? "成功!" : "失败!"));
         } else {
-            LogUtil.log("该文件不存在:" + from);
+            log("该文件不存在:" + from);
         }
     }
 
@@ -98,5 +104,13 @@ public class GoProRenamer {
     private String insertedName(String name, String index) {
         String[] split = name.split("\\.");
         return String.format("%s-%s.%s", split[0], index, split[1]);
+    }
+
+    private void log(String content) {
+        logger.log(content);
+    }
+
+    public interface OnLogListener {
+        void log(String content);
     }
 }
